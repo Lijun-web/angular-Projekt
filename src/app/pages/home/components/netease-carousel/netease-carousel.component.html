@@ -1,0 +1,13 @@
+<div class="carousel">
+  <div class="wrap">
+<!--    onChangeSlide接收参数pre和next-->
+    <i nz-icon class="arrow left" nzType="left" nzTheme="outline" (click)="onChangeSlide('pre')"></i>
+    <ng-content></ng-content>
+<!--    number为传过来的索引值-->
+    <ng-template #dot let-number>
+<!--      如果active class类为真则高亮-->
+      <i class="dot" [class.active]="activeIndex === number"></i>
+    </ng-template>
+    <i nz-icon class="arrow right" nzType="right" nzTheme="outline" (click)="onChangeSlide('next')"></i>
+  </div>
+</div>
