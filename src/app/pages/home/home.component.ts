@@ -1,7 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {HomeService} from "../../services/home.service";
-import {Banner, HotTag, PersonalizedSong} from "../../services/data-types/common.types"
+import {Banner, HotTag, PersonalizedSong, Singer} from "../../services/data-types/common.types"
 import {NzCarouselComponent} from "ng-zorro-antd/carousel";
+import {SingerService} from "../../services/singer.service";
+import {ActivatedRoute} from "@angular/router";
+import {map} from "rxjs/operators";
+import {SheetService} from "../../services/sheet.service";
 
 
 @Component({
@@ -15,42 +19,64 @@ export class HomeComponent implements OnInit {
   banners: Banner[];
   hotTags: HotTag[];
   personalizedSongs: PersonalizedSong[];
+  settledSingers: Singer[];
   carouselActiveIndex = 0;
 
   @ViewChild(NzCarouselComponent, {static: true}) private nzCarousel: any;
 
-  constructor(private homeServe: HomeService) {
+  constructor(
+    // private homeServe: HomeService,
+    // private singerServe: SingerService,
+    private route: ActivatedRoute,
+    private sheetServe: SheetService
+  ) {
     //构造器中初始化
     this.banners = [];
     this.hotTags = [];
     this.personalizedSongs = [];
+    this.settledSingers = [];
+    //data返回route中配置的所有数据
+    this.route.data.pipe(map(data => data.homeDatas)).subscribe(
+      ([banners, hotTags, personalizedSongs, settledSingers]) => {
+      this.banners = banners;
+      this.hotTags = hotTags;
+      this.personalizedSongs = personalizedSongs;
+      this.settledSingers = settledSingers;
+    });
 
   }
 
   ngOnInit(): void {
-    this.getBanners();
-    this.getHotTags();
-    this.getPersonalizedSongs();
+    // this.getBanners();
+    // this.getHotTags();
+    // this.getPersonalizedSongs();
+    // this.getSingers();
 
   }
 
-  private getBanners(){
-    this.homeServe.getBanners().subscribe(banners => {
-      this.banners = banners;
-    })
-  }
-
-  private getHotTags(){
-    this.homeServe.getHotTags().subscribe(tags => {
-      this.hotTags = tags;
-    })
-  }
-
-  private getPersonalizedSongs(){
-    this.homeServe.getPersonalizedSongs().subscribe(personalizedSongs => {
-      this.personalizedSongs = personalizedSongs;
-    })
-  }
+  // private getBanners(){
+  //   this.homeServe.getBanners().subscribe(banners => {
+  //     this.banners = banners;
+  //   })
+  // }
+  //
+  // private getHotTags(){
+  //   this.homeServe.getHotTags().subscribe(tags => {
+  //     this.hotTags = tags;
+  //   })
+  // }
+  //
+  // private getPersonalizedSongs(){
+  //   this.homeServe.getPersonalizedSongs().subscribe(personalizedSongs => {
+  //     this.personalizedSongs = personalizedSongs;
+  //   })
+  // }
+  //
+  // private getSingers() {
+  //   this.singerServe.getSettledSingers().subscribe(settledSingers => {
+  //     this.settledSingers = settledSingers;
+  //   })
+  // }
 
   onBeforeChange({to}: any) {
     this.carouselActiveIndex = to;
@@ -60,6 +86,12 @@ export class HomeComponent implements OnInit {
     this.nzCarousel[type](); //调用轮播图组件的pre或者next方法
   }
 
+  onPlaySheet(id: number) {
+    console.log('id', id);
+    this.sheetServe.playSheet(id).subscribe(data => {
+      console.log('data:', data);
+    })
+  }
 
 
 }

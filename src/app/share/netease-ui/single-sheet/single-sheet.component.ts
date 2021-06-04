@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 
 @Component({
   selector: 'app-single-sheet',
@@ -9,9 +9,14 @@ import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 export class SingleSheetComponent implements OnInit {
 
   @Input() sheet: any;
+  @Output() onPlay = new EventEmitter<number>(); //emit接收number类型参数
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  playSheet(id: number) {
+    this.onPlay.emit(id);
   }
 
 }

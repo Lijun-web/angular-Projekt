@@ -9,13 +9,13 @@ import {map} from "rxjs/operators";
 type SingerParams = {
   offset: number;
   limit: number;
-  cat?: string;
+  area?: number;
 }
 
 const defaultParams: SingerParams = {
   offset: 0,
   limit: 9,
-  cat: '5001'
+  area: 96
 }
 
 @Injectable({
@@ -25,9 +25,18 @@ export class SingerService {
 
   constructor(private http: HttpClient, @Inject(API_CONFIG) private uri:string) { }
 
-  getSettledSinger(arg: SingerParams = defaultParams): Observable<Singer[]>{
-    const params = new HttpParams({fromString: JSON.stringify(arg)});
-    return this.http.get(this.uri+'artist/list')
+  //将Json转换为请求参数
+  fromJsonToQueryString(arg: SingerParams): string{
+    return JSON.stringify(arg)
+      .replace(/\"\:/g,"=")
+      .replace(/,\"/g,"&")
+      .replace("{\"","")
+      .replace("}","");
+  }
+
+  getSettledSingers(arg: SingerParams = defaultParams): Observable<Singer[]>{
+    const params = new HttpParams({fromString: this.fromJsonToQueryString(arg)});
+    return this.http.get(this.uri+'artist/list', {params})
       .pipe(map((data:any) => data.artists));
   }
 }

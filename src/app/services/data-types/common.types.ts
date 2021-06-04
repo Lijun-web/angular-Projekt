@@ -10,16 +10,32 @@ export type HotTag = {
   position: number;
 }
 
-export type PersonalizedSong = {
-  id: number;
-  name: string;
-  picUrl: string;
-  playCount: number;
-}
 
 export type Singer = {
   id: number;
   name: string;
   picUrl: string;
   albumSize: number;
+}
+
+export type Song = {
+  id: number;
+  name: string;
+  url: string;
+  ar: Singer[]; //歌手信息
+  al: {id: number; name: string; picUrl: string};
+  dt: number;
+}
+
+export type PersonalizedSong = {
+  id: number;
+  name: string;
+  picUrl: string;
+  playCount: number;
+  tracks: Song[];
+}
+
+export type SongUrl = {
+  id: number;
+  url: string;
 }
