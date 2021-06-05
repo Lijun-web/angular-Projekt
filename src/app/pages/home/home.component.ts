@@ -6,6 +6,9 @@ import {SingerService} from "../../services/singer.service";
 import {ActivatedRoute} from "@angular/router";
 import {map} from "rxjs/operators";
 import {SheetService} from "../../services/sheet.service";
+import {AppStoreModule} from "../../store";
+import {Store} from "@ngrx/store";
+import {SetCurrentIndex, SetPlayList, SetSongList} from "../../store/actions/player.action";
 
 
 @Component({
@@ -28,7 +31,8 @@ export class HomeComponent implements OnInit {
     // private homeServe: HomeService,
     // private singerServe: SingerService,
     private route: ActivatedRoute,
-    private sheetServe: SheetService
+    private sheetServe: SheetService,
+    private store$: Store<AppStoreModule>
   ) {
     //构造器中初始化
     this.banners = [];
@@ -88,8 +92,11 @@ export class HomeComponent implements OnInit {
 
   onPlaySheet(id: number) {
     console.log('id', id);
-    this.sheetServe.playSheet(id).subscribe(data => {
-      console.log('data:', data);
+    this.sheetServe.playSheet(id).subscribe(list => {
+      //after these three function the value of PlayState in reducer will be changed and a new State will be returned
+      this.store$.dispatch(SetSongList({ songList: list }));
+      this.store$.dispatch(SetPlayList({ playList: list }));
+      this.store$.dispatch(SetCurrentIndex({ currentIndex: 0 }));
     })
   }
 

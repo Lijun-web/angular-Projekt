@@ -9,6 +9,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzCarouselModule } from 'ng-zorro-antd/carousel';
 import {NeteaseUiModule} from "./netease-ui/netease-ui.module";
 import { PlayCountPipe } from './play-count.pipe';
+import { FormatTimePipe } from './pipes/format-time.pipe';
 
 
 
@@ -37,6 +38,9 @@ import { PlayCountPipe } from './play-count.pipe';
     NzMenuModule,
     NzCarouselModule,
     NeteaseUiModule,
+
+  ],
+  declarations: [
 
   ]
 })
