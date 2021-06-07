@@ -1,5 +1,5 @@
 import {Lyric} from "../../../../services/data-types/common.types";
-import {from, Subject, zip} from "rxjs";
+import {from, Subject, Subscription, timer, zip} from "rxjs";
 import {skip} from "rxjs/operators";
 
 export interface BaseLyricLine {
@@ -32,7 +32,8 @@ export class NeteaseLyric {
   private startStamp: number = 0;
   private pauseStamp: number = 0;
   handler = new Subject<Handler>();
-  private timer: any;
+  // @ts-ignore
+  private timer$: Subscription;
 
   constructor(lrc: Lyric) {
     this.lrc = lrc;
@@ -118,7 +119,7 @@ export class NeteaseLyric {
     // }
   }
 
-  play(startTime = 0) {
+  play(startTime = 0, skip = false) {
     if (!this.lines.length) return;
     if (!this.playing) {
       this.playing = true;
@@ -129,10 +130,16 @@ export class NeteaseLyric {
     this.startStamp = Date.now() - startTime;
     // console.log('this.startStamp', this.startStamp);
 
+    //skip this step only when togglePlay() called
+    if (!skip) {
+      this.callHandler(this.curNum - 1);
+    }
+
     //not in the end of the song lyric
     if (this.curNum < this.lines.length) {
       //clear timer before every time play
-      clearTimeout(this.timer);
+      this.clearTime();
+      // clearTimeout(this.timer);
       this.playReset();
     }
   }
@@ -142,22 +149,37 @@ export class NeteaseLyric {
     //delay is the time for lyric line lines[this.curNum - 1]
     const delay = (line.time - (Date.now() - this.startStamp) - 900);
 
-    this.timer = setTimeout(() => {
+    this.timer$ = timer(delay).subscribe(() => {
       //the index of lyric line gonna to be played will be emitted outside
       this.callHandler(this.curNum ++);
 
       if (this.curNum < this.lines.length && this.playing) {
         this.playReset();
       }
-    }, delay);
+    })
+    // this.timer = setTimeout(() => {
+    //   //the index of lyric line gonna to be played will be emitted outside
+    //   this.callHandler(this.curNum ++);
+    //
+    //   if (this.curNum < this.lines.length && this.playing) {
+    //     this.playReset();
+    //   }
+    // }, delay);
   }
 
+  private clearTime() {
+    this.timer$ && this.timer$.unsubscribe();
+  }
+
+
   private callHandler(i: number) {
-    this.handler.next({
-      txt: this.lines[i].txt,
-      txtCn: this.lines[i].txtCn,
-      lineNum: i
-    });
+    if (i > 0) {
+      this.handler.next({
+        txt: this.lines[i].txt,
+        txtCn: this.lines[i].txtCn,
+        lineNum: i
+      });
+    }
   }
 
   private findCurNum(time: number): number {
@@ -169,7 +191,7 @@ export class NeteaseLyric {
     this.playing = playing;
     if (playing) {
       const startTime = this.pauseStamp - this.startStamp;
-      this.play(startTime);
+      this.play(startTime, true);
     } else {
       this.stop();
       this.pauseStamp = now;
@@ -180,6 +202,10 @@ export class NeteaseLyric {
     if (this.playing) {
       this.playing = false;
     }
-    clearTimeout(this.timer)
+    this.clearTime();
+  }
+
+  seek(time: number) {
+    this.play(time);
   }
 }
