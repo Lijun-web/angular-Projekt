@@ -7,8 +7,10 @@ import {ActivatedRoute} from "@angular/router";
 import {map} from "rxjs/operators";
 import {SheetService} from "../../services/sheet.service";
 import {AppStoreModule} from "../../store";
-import {Store} from "@ngrx/store";
+import {select, Store} from "@ngrx/store";
 import {SetCurrentIndex, SetPlayList, SetSongList} from "../../store/actions/player.action";
+import {PlayState} from "../../store/reducers/player.reducer";
+import {shuffle} from "../../utils/array";
 
 
 @Component({
@@ -24,6 +26,7 @@ export class HomeComponent implements OnInit {
   personalizedSongs: PersonalizedSong[];
   settledSingers: Singer[];
   carouselActiveIndex = 0;
+  private playState: PlayState | undefined;
 
   @ViewChild(NzCarouselComponent, {static: true}) private nzCarousel: any;
 
@@ -47,6 +50,9 @@ export class HomeComponent implements OnInit {
       this.personalizedSongs = personalizedSongs;
       this.settledSingers = settledSingers;
     });
+    //get the playstate of player
+    // @ts-ignore
+    this.store$.pipe(select('player')).subscribe(res => this.playState = res);
 
   }
 
@@ -95,7 +101,15 @@ export class HomeComponent implements OnInit {
     this.sheetServe.playSheet(id).subscribe(list => {
       //after these three function the value of PlayState in reducer will be changed and a new State will be returned
       this.store$.dispatch(SetSongList({ songList: list }));
-      this.store$.dispatch(SetPlayList({ playList: list }));
+
+      let trueIndex = 0;
+      let trueList = list.slice();
+
+      if (this.playState?.playMode.type === 'random') {
+        trueList = shuffle(list || []);
+        trueIndex = trueList.findIndex(item => item.id === list[trueIndex].id);
+      }
+      this.store$.dispatch(SetPlayList({ playList: trueList }));
       this.store$.dispatch(SetCurrentIndex({ currentIndex: 0 }));
     })
   }
