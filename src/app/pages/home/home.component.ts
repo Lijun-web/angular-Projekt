@@ -3,7 +3,7 @@ import {HomeService} from "../../services/home.service";
 import {Banner, HotTag, PersonalizedSong, Singer} from "../../services/data-types/common.types"
 import {NzCarouselComponent} from "ng-zorro-antd/carousel";
 import {SingerService} from "../../services/singer.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {map} from "rxjs/operators";
 import {SheetService} from "../../services/sheet.service";
 import {AppStoreModule} from "../../store";
@@ -11,6 +11,7 @@ import {select, Store} from "@ngrx/store";
 import {SetCurrentIndex, SetPlayList, SetSongList} from "../../store/actions/player.action";
 import {PlayState} from "../../store/reducers/player.reducer";
 import {shuffle} from "../../utils/array";
+import {BatchActionsService} from "../../store/batch-actions.service";
 
 
 @Component({
@@ -34,8 +35,10 @@ export class HomeComponent implements OnInit {
     // private homeServe: HomeService,
     // private singerServe: SingerService,
     private route: ActivatedRoute,
+    private router: Router,
     private sheetServe: SheetService,
-    private store$: Store<AppStoreModule>
+    private store$: Store<AppStoreModule>,
+    private batchActionsServe: BatchActionsService
   ) {
     //构造器中初始化
     this.banners = [];
@@ -52,7 +55,7 @@ export class HomeComponent implements OnInit {
     });
     //get the playstate of player
     // @ts-ignore
-    this.store$.pipe(select('player')).subscribe(res => this.playState = res);
+    // this.store$.pipe(select('player')).subscribe(res => this.playState = res);
 
   }
 
@@ -99,20 +102,26 @@ export class HomeComponent implements OnInit {
   onPlaySheet(id: number) {
     console.log('id', id);
     this.sheetServe.playSheet(id).subscribe(list => {
-      //after these three function the value of PlayState in reducer will be changed and a new State will be returned
-      this.store$.dispatch(SetSongList({ songList: list }));
 
-      let trueIndex = 0;
-      let trueList = list.slice();
-
-      if (this.playState?.playMode.type === 'random') {
-        trueList = shuffle(list || []);
-        trueIndex = trueList.findIndex(item => item.id === list[trueIndex].id);
-      }
-      this.store$.dispatch(SetPlayList({ playList: trueList }));
-      this.store$.dispatch(SetCurrentIndex({ currentIndex: 0 }));
-    })
+      this.batchActionsServe.selectPlayList({list, index: 0});
+    });
+    // this.sheetServe.playSheet(id).subscribe(list => {
+    //   //after these three function the value of PlayState in reducer will be changed and a new State will be returned
+    //   this.store$.dispatch(SetSongList({ songList: list }));
+    //
+    //   let trueIndex = 0;
+    //   let trueList = list.slice();
+    //
+    //   if (this.playState?.playMode.type === 'random') {
+    //     trueList = shuffle(list || []);
+    //     trueIndex = trueList.findIndex(item => item.id === list[trueIndex].id);
+    //   }
+    //   this.store$.dispatch(SetPlayList({ playList: trueList }));
+    //   this.store$.dispatch(SetCurrentIndex({ currentIndex: 0 }));
+    // });
   }
 
-
+  toInfo(id: number) {
+    this.router.navigate(['/sheetInfo', id]);
+  }
 }

@@ -31,8 +31,18 @@ export type PersonalizedSong = {
   id: number;
   name: string;
   picUrl: string;
+  coverImgUrl: string;
   playCount: number;
   tracks: Song[];
+  tags: string[];
+  createTime: number;
+  creator: { nickname: string; avatarUrl: string; };
+  description: string;
+  subscribedCount: number;
+  shareCount: number;
+  commentCount: number;
+  subscribed: boolean;
+  userId: number;
 }
 
 export type SongUrl = {
@@ -43,4 +53,9 @@ export type SongUrl = {
 export type Lyric = {
   lyric: string;
   tlyric: string;
+}
+
+export type SheetList = {
+  playlists: PersonalizedSong[],
+  total: number
 }

@@ -8,11 +8,14 @@ import {NzInputModule} from "ng-zorro-antd/input";
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzCarouselModule } from 'ng-zorro-antd/carousel';
 import {NeteaseUiModule} from "./netease-ui/netease-ui.module";
-import { PlayCountPipe } from './play-count.pipe';
+import { PlayCountPipe } from './pipes/play-count.pipe';
 import { FormatTimePipe } from './pipes/format-time.pipe';
-
-
-
+import { ClickoutsideDirective } from './directives/clickoutside.directive';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 
 @NgModule({
@@ -26,7 +29,12 @@ import { FormatTimePipe } from './pipes/format-time.pipe';
     NzInputModule,
     NzMenuModule,
     NzCarouselModule,
-    NeteaseUiModule
+    NeteaseUiModule,
+    NzRadioModule,
+    NzPaginationModule,
+    NzTagModule,
+    NzTableModule,
+    NzMessageModule
   ],
   exports:[
     CommonModule,
@@ -38,10 +46,12 @@ import { FormatTimePipe } from './pipes/format-time.pipe';
     NzMenuModule,
     NzCarouselModule,
     NeteaseUiModule,
-
+    NzRadioModule,
+    NzPaginationModule,
+    NzTagModule,
+    NzTableModule,
+    NzMessageModule
   ],
-  declarations: [
 
-  ]
 })
 export class ShareModule { }

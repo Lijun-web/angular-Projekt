@@ -21,7 +21,8 @@ interface Handler extends BaseLyricLine {
 //   time: number
 // }
 
-const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+// const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+const timeExp = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/;
 
 export class NeteaseLyric {
   private lrc: Lyric;
@@ -132,6 +133,7 @@ export class NeteaseLyric {
 
     //skip this step only when togglePlay() called
     if (!skip) {
+      console.log('skip');
       this.callHandler(this.curNum - 1);
     }
 
@@ -141,14 +143,17 @@ export class NeteaseLyric {
       this.clearTime();
       // clearTimeout(this.timer);
       this.playReset();
+
     }
   }
 
   private playReset() {
     let line = this.lines[this.curNum];
     //delay is the time for lyric line lines[this.curNum - 1]
-    const delay = (line.time - (Date.now() - this.startStamp) - 900);
 
+    const delay = (line?.time - (Date.now() - this.startStamp) - 100);
+
+    console.log('1');
     this.timer$ = timer(delay).subscribe(() => {
       //the index of lyric line gonna to be played will be emitted outside
       this.callHandler(this.curNum ++);
@@ -156,6 +161,7 @@ export class NeteaseLyric {
       if (this.curNum < this.lines.length && this.playing) {
         this.playReset();
       }
+
     })
     // this.timer = setTimeout(() => {
     //   //the index of lyric line gonna to be played will be emitted outside
@@ -173,6 +179,7 @@ export class NeteaseLyric {
 
 
   private callHandler(i: number) {
+    console.log('5');
     if (i > 0) {
       this.handler.next({
         txt: this.lines[i].txt,
