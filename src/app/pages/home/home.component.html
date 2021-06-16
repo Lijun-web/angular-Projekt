@@ -56,7 +56,7 @@
             <b>入驻歌手</b>
           </div>
           <div class="list">
-            <div class="card" *ngFor="let item of settledSingers">
+            <div class="card" *ngFor="let item of settledSingers" [routerLink]="['/singer', item.id]">
               <div class="pic">
                 <img [src]="item.picUrl" [alt]="item.name">
               </div>

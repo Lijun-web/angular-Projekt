@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {API_CONFIG, ServicesModule} from "./services.module";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Banner, Singer} from "./data-types/common.types";
+import {Banner, Singer, SingerDetail} from "./data-types/common.types";
 import {map} from "rxjs/operators";
 
 
@@ -39,4 +39,19 @@ export class SingerService {
     return this.http.get(this.uri+'artist/list', {params})
       .pipe(map((data:any) => data.artists));
   }
+
+  //获取歌手单曲
+  getSingerDetail(id: string): Observable<SingerDetail> {
+    const params = new HttpParams().set('id', id);
+    return this.http.get(this.uri + 'artists', { params })
+      .pipe(map(data => data as SingerDetail));
+  }
+
+  //获取相似歌手
+  getSimiSingers(id: string): Observable<Singer[]> {
+    const params = new HttpParams().set('id', id);
+    return this.http.get(this.uri + 'simi/artist', { params })
+      .pipe(map((data: any) => data.artists));
+  }
+
 }
